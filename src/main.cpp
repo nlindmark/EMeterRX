@@ -82,7 +82,7 @@ void loop()
 
         _radio.readData(&radioPacket);
        
-        float power = 360 * radioPacket.pulses / (now - lastTime);
+        float power = 360 * radioPacket.pulses / (float)(now - lastTime);
         char str[20];
         snprintf(str, sizeof(str),  "%.2f", power);
         mqttClient.publish("stat/emeter/mompower", str);
