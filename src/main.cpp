@@ -32,6 +32,7 @@ movingAvg avg(240);
 
 
 uint32_t lastTime = 0;
+uint32_t lastPulses = 0;
 uint32_t now;
 
 struct RadioPacket
@@ -82,15 +83,21 @@ void loop()
 
         _radio.readData(&radioPacket);
        
-        float power = 360 * radioPacket.pulses / (float)(now - lastTime);
-        char str[20];
-        snprintf(str, sizeof(str),  "%.2f", power);
-        mqttClient.publish("stat/emeter/mompower", str);
+        float power = 57600 * (radioPacket.pulsesTotal - lastPulses) / (float)(now - lastTime);
+
+        if(power < 30){
+            char str[20];
+            snprintf(str, sizeof(str),  "%.3f", power);
+            mqttClient.publish("stat/emeter/mompower", str);
+
+           
+        
+            Serial.print("Power: ");
+            Serial.println(power);
+        }
 
         lastTime = now;
-
-        Serial.print("Power: ");
-        Serial.println(power);
+        lastPulses = radioPacket.pulsesTotal;
       }
     
 }
